@@ -1,4 +1,4 @@
-"""PinStamp — local web page (stdlib http.server, 127.0.0.1 only, PyMuPDF for
+"""PinStamper — local web page (stdlib http.server, 127.0.0.1 only, PyMuPDF for
 rendering/drawing) for manually stamping numbered pins + optional direction
 arrows onto any PDF. Nothing here auto-detects anything; every mark is a
 deliberate click.
@@ -11,7 +11,7 @@ Design goals:
   - Real, editable PDF output: "Export marked PDF" writes each stamp as
     genuine PDF annotation objects (Circle / Line / Polygon / FreeText), not
     flattened page content. Anyone opening the exported file in Adobe
-    Acrobat/Reader (no PinStamp install needed) can select, move, recolor, or
+    Acrobat/Reader (no PinStamper install needed) can select, move, recolor, or
     delete a mark afterward — same as any PDF comment.
   - Per-marker style: each pin has its own color (from a small palette),
     size, border style (solid/dashed/none), and an optional arrow whose angle and
@@ -149,7 +149,7 @@ def _save_state(pdf_path: Path, state: dict) -> None:
                                    encoding="utf-8")
 
 
-_PAGE = """<!doctype html><meta charset="utf-8"><title>PinStamp</title>
+_PAGE = """<!doctype html><meta charset="utf-8"><title>PinStamper</title>
 <style>
  body{font-family:"Segoe UI",sans-serif;margin:0;background:#e8e8e8}
  #bar{position:sticky;top:0;background:#fff;padding:8px 14px;border-bottom:2px solid #333;
@@ -166,7 +166,10 @@ _PAGE = """<!doctype html><meta charset="utf-8"><title>PinStamp</title>
  #list table{border-collapse:collapse}
  #list td,#list th{border:1px solid #ccc;padding:3px 8px}
  .del{color:#c00;cursor:pointer}
- .upl{margin-left:auto}
+ .upl{margin-left:auto;background:#fff3e0;border:2px dashed #ef6c00;border-radius:4px;
+      padding:7px 16px;font-size:14px;font-weight:bold;color:#e65100;cursor:pointer}
+ .upl:hover{background:#ffe0b2}
+ .upl input{display:none}
  .swatch{display:inline-block;width:12px;height:12px;border:1px solid #999;
          border-radius:50%;vertical-align:middle;margin-right:4px}
  .swbtn{width:22px;height:22px;padding:0;border:2px solid #fff;border-radius:50%;
@@ -174,7 +177,7 @@ _PAGE = """<!doctype html><meta charset="utf-8"><title>PinStamp</title>
  .swbtn.active{box-shadow:0 0 0 2px #2962ff}
 </style>
 <div id="bar">
- <b>📍 PinStamp</b>
+ <b>📍 PinStamper</b>
  <label>Page <select id="pageSel"></select></label>
  <button id="btnSolid" class="active">● Solid</button>
  <button id="btnDashed">○ Dashed</button>
@@ -189,7 +192,7 @@ _PAGE = """<!doctype html><meta charset="utf-8"><title>PinStamp</title>
  <button id="btnExport" style="background:#c8e6c9">✅ Export marked PDF</button>
  <button id="btnQuit" style="background:#ffcdd2">⏻ Quit</button>
  <span id="msg"></span>
- <span class="upl"><input type="file" id="fileInput" accept="application/pdf"> Upload different PDF</span>
+ <label class="upl" title="Upload a different PDF to mark up">📤 Upload PDF to edit<input type="file" id="fileInput" accept="application/pdf"></label>
 </div>
 <div id="wrap"><canvas id="cv"></canvas></div>
 <div id="list"></div>
@@ -445,7 +448,7 @@ document.getElementById('fileInput').onchange = async (e) => {
   if (j.ok) location.reload(); else msg(j.msg);
 };
 document.getElementById('btnQuit').onclick = () => {
-  if (confirm('Quit PinStamp? (already-placed markers are saved)')) {
+  if (confirm('Quit PinStamper? (already-placed markers are saved)')) {
     fetch('/quit', {method: 'POST'});
     document.body.innerHTML = '<p style="padding:40px;font-size:16px">Closed. This tab and the background app can now be closed.</p>';
   }
@@ -616,7 +619,7 @@ def serve(pdf_path: str, port: int = 8766, open_browser: bool = True) -> None:
     threading.Thread(target=_watch, daemon=True).start()
     url = f"http://127.0.0.1:{port}/"
     try:
-        print(f"PinStamp: {url}  (editing {path.name}, Ctrl+C to quit)")
+        print(f"PinStamper: {url}  (editing {path.name}, Ctrl+C to quit)")
     except Exception:
         pass  # no console when frozen as a --windowed exe
     if open_browser:

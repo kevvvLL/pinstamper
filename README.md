@@ -1,4 +1,4 @@
-# PinStamp
+# PinStamper
 
 A tiny local web tool for stamping numbered pins + direction arrows onto any
 PDF — by hand, one click at a time. Built for annotating plan drawings
@@ -9,13 +9,13 @@ way") without a heavyweight CAD or PDF-editing suite.
 No auto-detection, no AI, no cloud — it's a precise, deliberate clicking
 tool that runs entirely on your machine.
 
-![PinStamp sample export: four colored pins with per-pin size, style, and arrows](docs/screenshot.png)
+![PinStamper sample export: four colored pins with per-pin size, style, and arrows](docs/screenshot.png)
 
 ## Why
 
 Most "add a comment to a PDF" tools either flatten your markup into the page
 (so it can never be edited again) or require a full desktop PDF editor.
-PinStamp does neither:
+PinStamper does neither:
 
 - **Non-destructive while you work.** The source PDF is never touched. Every
   pin lives in a sidecar `<name>.pinstamp.json` next to it, autosaved on every
@@ -24,7 +24,7 @@ PinStamp does neither:
 - **Real, editable PDF output.** "Export marked PDF" writes each pin as a
   genuine PDF annotation (Circle / Line / Polygon / FreeText) — not
   rasterized or flattened content. Anyone opening the exported file in Adobe
-  Acrobat/Reader (no PinStamp install needed) can select, move, recolor, or
+  Acrobat/Reader (no PinStamper install needed) can select, move, recolor, or
   delete a mark afterward, the same as any PDF comment.
 - **Per-pin style.** Each pin has its own color (from a small built-in
   palette), size, and border style (solid/dashed/no circle at all), and an
@@ -74,7 +74,7 @@ native "Open PDF" file picker.
 build.bat
 ```
 
-Produces `dist/PinStamp.exe` (via PyInstaller; onefile, ~50MB). First run may
+Produces `dist/PinStamper.exe` (via PyInstaller; onefile, ~50MB). First run may
 be flagged by Windows SmartScreen since the exe isn't code-signed — click
 "More info" → "Run anyway".
 

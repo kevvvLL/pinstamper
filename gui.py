@@ -1,5 +1,5 @@
-"""PinStamp — standalone launcher (tkinter, packaged as PinStamp.exe).
-Double-click -> native "Open PDF" dialog -> PinStamp opens in the browser,
+"""PinStamper — standalone launcher (tkinter, packaged as PinStamper.exe).
+Double-click -> native "Open PDF" dialog -> PinStamper opens in the browser,
 ready to click-and-stamp immediately.
 """
 
@@ -17,7 +17,7 @@ if getattr(sys, "frozen", False):  # PyInstaller bundle
 else:
     sys.path.insert(0, str(Path(__file__).parent))
 
-CONFIG = Path(os.environ.get("APPDATA", ".")) / "PinStamp" / "gui.json"
+CONFIG = Path(os.environ.get("APPDATA", ".")) / "PinStamper" / "gui.json"
 
 
 def _free_port(start=8766):
@@ -67,7 +67,7 @@ def main() -> None:
     try:
         serve(str(pdf_path), port=_free_port(), open_browser=True)
     except Exception as e:
-        messagebox.showerror("PinStamp", f"Failed to start: {e}")
+        messagebox.showerror("PinStamper", f"Failed to start: {e}")
 
 
 if __name__ == "__main__":
