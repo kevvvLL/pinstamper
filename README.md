@@ -11,6 +11,27 @@ tool that runs entirely on your machine.
 
 ![PinStamper toolbar and canvas: five pins across solid/dashed/no-border styles, per-pin color and size, and direction arrows, over a sample site plan](docs/screenshot.png)
 
+## The idea
+
+Marking up a plan usually isn't slow because of the marking — it's the
+repetition. In most PDF tools, every single point means: select the circle
+tool, draw a circle, switch to the text tool, type a number, switch to the
+arrow tool, drag a line — then do it all again for the next point. Even
+professional tools that get close (Bluebeam Revu's "Sequences" feature can
+auto-increment a markup's number) still require you to manually set up that
+numbering sequence first, and still place the shape and its arrow as
+separate steps. Construction punch-list apps (Punchly, OpenSpace, and
+similar) do drop numbered pins on a plan, but they're cloud/mobile products,
+and placing a pin and aiming a direction arrow are still two disconnected
+actions rather than one gesture.
+
+PinStamper's whole design is built around collapsing that into a single
+loop: **click** to drop a pin, **move the mouse** to aim its arrow, **click**
+again to confirm — and the next number is already active, no reselecting
+anything. Marking up a page of dozens of points becomes one continuous
+motion instead of a string of tool switches, entirely free and running
+locally, with no account, no setup, and no per-seat license.
+
 ## Why
 
 Most "add a comment to a PDF" tools either flatten your markup into the page
