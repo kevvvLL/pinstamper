@@ -94,7 +94,8 @@ string of tool switches.
   place, without restarting the tool.
 - **Export marked PDF** — writes `<name>_marked.pdf` next to the source.
   Repeat exports never overwrite: you get `_marked_v2.pdf`,
-  `_marked_v3.pdf`, and so on.
+  `_marked_v3.pdf`, and so on. On Windows, a File Explorer window opens with
+  the new file selected.
 - **⏻ Quit** — shuts down the local server from the page (handy for the
   packaged exe, which has no console).
 
