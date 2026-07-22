@@ -75,7 +75,9 @@ python -m pinstamp.core plan.pdf --no-browser    # don't auto-open a browser tab
   already placed: click it, move the mouse, click the canvas to confirm.
 - **⊘** removes a pin's arrow; **✕** deletes the pin entirely.
 - **📤 Upload PDF to edit** — the bold button in the top-right of the
-  toolbar swaps in a different PDF to mark up, without restarting the tool.
+  toolbar opens a native "Open PDF" dialog and switches to marking up that
+  file in place, without restarting the tool. (It opens the real file where
+  it already lives, rather than copying it somewhere new.)
 - **Export marked PDF** writes `<name>_marked.pdf` next to your source file.
   Exporting never overwrites a previous export — repeated exports get
   `_marked_v2.pdf`, `_marked_v3.pdf`, and so on.

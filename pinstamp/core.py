@@ -169,7 +169,6 @@ _PAGE = """<!doctype html><meta charset="utf-8"><title>PinStamper</title>
  .upl{margin-left:auto;background:#fff3e0;border:2px dashed #ef6c00;border-radius:4px;
       padding:7px 16px;font-size:14px;font-weight:bold;color:#e65100;cursor:pointer}
  .upl:hover{background:#ffe0b2}
- .upl input{display:none}
  .swatch{display:inline-block;width:12px;height:12px;border:1px solid #999;
          border-radius:50%;vertical-align:middle;margin-right:4px}
  .swbtn{width:22px;height:22px;padding:0;border:2px solid #fff;border-radius:50%;
@@ -192,7 +191,7 @@ _PAGE = """<!doctype html><meta charset="utf-8"><title>PinStamper</title>
  <button id="btnExport" style="background:#c8e6c9">✅ Export marked PDF</button>
  <button id="btnQuit" style="background:#ffcdd2">⏻ Quit</button>
  <span id="msg"></span>
- <label class="upl" title="Upload a different PDF to mark up">📤 Upload PDF to edit<input type="file" id="fileInput" accept="application/pdf"></label>
+ <button id="btnUpload" class="upl" title="Open a different PDF to mark up">📤 Upload PDF to edit</button>
 </div>
 <div id="wrap"><canvas id="cv"></canvas></div>
 <div id="list"></div>
@@ -439,13 +438,11 @@ document.getElementById('btnExport').onclick = async () => {
   const j = await r.json();
   msg(j.msg);
 };
-document.getElementById('fileInput').onchange = async (e) => {
-  const f = e.target.files[0]; if (!f) return;
-  msg('Uploading...');
-  const buf = await f.arrayBuffer();
-  const r = await fetch('/upload', {method: 'POST', headers: {'X-Filename': encodeURIComponent(f.name)}, body: buf});
+document.getElementById('btnUpload').onclick = async () => {
+  msg('Waiting for file picker...');
+  const r = await fetch('/pick', {method: 'POST'});
   const j = await r.json();
-  if (j.ok) location.reload(); else msg(j.msg);
+  if (j.ok) location.reload(); else msg(j.msg || '');
 };
 document.getElementById('btnQuit').onclick = () => {
   if (confirm('Quit PinStamper? (already-placed markers are saved)')) {
@@ -474,7 +471,6 @@ loadPage();
 
 class _Handler(BaseHTTPRequestHandler):
     pdf_path: Path = None
-    upload_dir: Path = None
     httpd: ThreadingHTTPServer = None
     last_ping: float = 0.0
 
@@ -548,15 +544,29 @@ class _Handler(BaseHTTPRequestHandler):
                                          "nextNumber": data.get("nextNumber", 1)})
             return self._json({"ok": True})
 
-        if self.path == "/upload":
-            fname = self.headers.get("X-Filename", "uploaded.pdf")
-            from urllib.parse import unquote
-            fname = Path(unquote(fname)).name or "uploaded.pdf"
-            target = self.upload_dir / fname
-            target.write_bytes(raw)
+        if self.path == "/pick":
+            # a native dialog (not a browser <input type=file>) so we get the
+            # real absolute path -- browsers deliberately hide that from JS,
+            # which is what previously forced uploads to be copied into
+            # whatever folder the tool happened to be launched from
+            try:
+                import tkinter as tk
+                from tkinter import filedialog
+                root = tk.Tk()
+                root.withdraw()
+                root.attributes("-topmost", True)
+                chosen = filedialog.askopenfilename(
+                    title="Open a PDF to mark up", filetypes=[("PDF", "*.pdf")])
+                root.destroy()
+            except Exception as e:
+                return self._json({"ok": False, "msg": f"Couldn't open file picker: {e}"})
+            if not chosen:
+                return self._json({"ok": False, "msg": ""})
+            target = Path(chosen).resolve()
             _Handler.pdf_path = target
-            _save_state(target, {"markers": [], "nextNumber": 1})
-            return self._json({"ok": True})
+            if not _sidecar(target).exists():
+                _save_state(target, {"markers": [], "nextNumber": 1})
+            return self._json({"ok": True, "path": str(target)})
 
         if self.path == "/export":
             data = json.loads(raw or b"{}")
@@ -594,7 +604,6 @@ def serve(pdf_path: str, port: int = 8766, open_browser: bool = True) -> None:
     if not path.is_file():
         raise FileNotFoundError(pdf_path)
     _Handler.pdf_path = path
-    _Handler.upload_dir = path.parent
     for p in range(port, port + 20):
         try:
             httpd = ThreadingHTTPServer(("127.0.0.1", p), _Handler)

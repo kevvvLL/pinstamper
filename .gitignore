@@ -7,3 +7,9 @@ dist/
 *_marked.pdf
 *_marked_v*.pdf
 .DS_Store
+
+# sample/ only ships the one bundled demo PDF -- anything else that lands
+# there (e.g. via the in-app "Upload PDF to edit" button) is someone's real
+# working file, not a repo asset, and should never get committed
+sample/*
+!sample/sample-plan.pdf
